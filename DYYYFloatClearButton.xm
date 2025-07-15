@@ -135,7 +135,7 @@ void initTargetClassNames(void) {
 
         // 设置默认状态为半透明
         self.originalAlpha = 1.0; // 交互时为完全不透明
-        self.alpha = 0.5;         // 初始为半透明
+        self.alpha = 0.7;         // 初始为半透明
         // 加载保存的锁定状态
         [self loadLockState];
         [self loadIcons];
@@ -173,7 +173,7 @@ void initTargetClassNames(void) {
                                                        block:^(NSTimer *timer) {
                                                          [UIView animateWithDuration:0.3
                                                                           animations:^{
-                                                                            self.alpha = 0.5; // 变为半透明
+                                                                            self.alpha = 0.7; // 变为半透明
                                                                           }];
                                                        }];
     // 交互时变为完全不透明
