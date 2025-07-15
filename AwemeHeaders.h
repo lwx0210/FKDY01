@@ -557,6 +557,11 @@ static CGFloat gStartVal = 0.0;
 @property(nonatomic, assign, getter=isHidden) BOOL hidden;
 @end
 
+@interface AWEFeedStickerContainerView : UIView
+@property(nonatomic, strong, readonly) UIView *superview;
+@property(nonatomic, assign, getter=isHidden) BOOL hidden;
+@end
+
 @interface AWEECommerceEntryView : UIView
 @property(nonatomic, strong, readonly) UIView *superview;
 @property(nonatomic, assign, getter=isHidden) BOOL hidden;
@@ -1294,4 +1299,28 @@ static CGFloat gStartVal = 0.0;
 
 @interface HTSEventForwardingView : UIView
 @property(copy, nonatomic) NSString *levelName;
+@end
+
+//修改id附加起始位 
+@interface AWEUserHomeAccessibilityViewV2 : UIView
+- (void)findAndModifyDouyinLabelInView:(UIView *)view;
+- (void)findAndModify:(UIView *)view;
+- (void)modifyNicknameInView:(UIView *)view;
+@end
+
+//数据伪造
+@interface AWEProfileSocialStatisticView : UIView
+- (void)setFansCount:(NSNumber *)count;
+- (void)setPraiseCount:(NSNumber *)count;
+- (void)setFollowingCount:(NSNumber *)count;
+- (void)setFriendCount:(NSNumber *)count;
+- (void)p_updateSocialStatisticContent:(BOOL)animated;
+@end
+
+@interface AWEProfileHeaderMyProfileViewController : UIViewController
+- (void)reloadSettings;
+@end
+
+//AI搜索
+@interface AWESearchKeyboardVoiceSearchEntranceView : UIView
 @end

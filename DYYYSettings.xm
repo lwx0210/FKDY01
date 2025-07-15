@@ -214,84 +214,77 @@ extern "C"
       // 【视频播放设置】分类
       NSMutableArray<AWESettingItemModel *> *videoItems = [NSMutableArray array];
       NSArray *videoSettings = @[
-          @{
-              @"identifier" : @"DYYYVideoBGColor",
-              @"title" : @"视频背景颜色",
-              @"subTitle" : @"可以自定义部分横屏视频的背景颜色",
-              @"detail" : @"",
-              @"cellType" : @20,
-              @"imageName" : @"ic_tv_outlined_20"
-          },
-          @{@"identifier" : @"DYYYShowScheduleDisplay",
-            @"title" : @"显示进度时长",
-            @"detail" : @"",
-            @"cellType" : @6,
-            @"imageName" : @"ic_playertime_outlined_20"},
-          @{@"identifier" : @"DYYYScheduleStyle",
-            @"title" : @"进度时长样式",
-            @"detail" : @"",
-            @"cellType" : @26,
-            @"imageName" : @"ic_playertime_outlined_20"},
-          @{@"identifier" : @"DYYYProgressLabelColor",
-            @"title" : @"进度标签颜色",
-            @"detail" : @"十六进制",
-            @"cellType" : @26,
-            @"imageName" : @"ic_playertime_outlined_20"},
-          @{@"identifier" : @"DYYYTimelineVerticalPosition",
-            @"title" : @"进度纵轴位置",
-            @"detail" : @"-12.5",
-            @"cellType" : @26,
-            @"imageName" : @"ic_playertime_outlined_20"},
-          @{@"identifier" : @"DYYYHideVideoProgress",
-            @"title" : @"隐藏视频进度",
-            @"detail" : @"",
-            @"cellType" : @6,
-            @"imageName" : @"ic_playertime_outlined_20"},
-          @{
-              @"identifier" : @"DYYYEnableAutoPlay",
-              @"title" : @"启用自动播放",
-              @"subTitle" : @"暂时仅支持推荐、搜索和个人主页的自动连播",
-              @"detail" : @"",
-              @"cellType" : @37,
-              @"imageName" : @"ic_play_outlined_12"
-          },
-          @{@"identifier" : @"DYYYDefaultSpeed",
-            @"title" : @"设置默认倍速",
-            @"detail" : @"",
-            @"cellType" : @26,
-            @"imageName" : @"ic_speed_outlined_20"},
-          @{@"identifier" : @"DYYYLongPressSpeed",
-            @"title" : @"设置长按倍速",
-            @"detail" : @"",
-            @"cellType" : @26,
-            @"imageName" : @"ic_speed_outlined_20"},
-          @{@"identifier" : @"DYYYEnableArea",
-            @"title" : @"时间属地显示",
-            @"detail" : @"",
-            @"cellType" : @6,
-            @"imageName" : @"ic_location_outlined_20"},
-          @{
-              @"identifier" : @"DYYYGeonamesUsername",
-              @"title" : @"国外解析账号",
-              @"subTitle" : @"使用 Geonames.org 账号解析国外 IP 属地",
-              @"detail" : @"",
-              @"cellType" : @20,
-              @"imageName" : @"ic_location_outlined_20"
-          },
-          @{@"identifier" : @"DYYYLabelColor",
-            @"title" : @"属地标签颜色",
-            @"detail" : @"十六进制",
-            @"cellType" : @26,
-            @"imageName" : @"ic_location_outlined_20"},
-          @{
-              @"identifier" : @"DYYYEnableRandomGradient",
-              @"title" : @"属地随机渐变",
-              @"subTitle" : @"启用后将覆盖上面的属地标签颜色",
-              @"detail" : @"",
-              @"cellType" : @37,
-              @"imageName" : @"ic_location_outlined_20"
-          }
-      ];
+ 		        @{@"identifier" : @"DYYYVideoBGColor",
+		          @"title" : @"视频背景颜色",
+			      @"subTitle" : @"可以自定义部分横屏视频的背景颜色",
+		          @"detail" : @"16进制,只填后6位即可,不填默认",
+		          @"cellType" : @20,
+		          @"imageName" : @"ic_tv_outlined_20"},
+			    @{@"identifier" : @"DYYYShowScheduleDisplay",
+			      @"title" : @"显示进度时长",
+			      @"detail" : @"",
+			      @"cellType" : @6,
+			      @"imageName" : @"ic_playertime_outlined_20"},
+			    @{@"identifier" : @"DYYYScheduleStyle",
+			      @"title" : @"进度时长样式",
+			      @"detail" : @"",
+			      @"cellType" : @26,
+			      @"imageName" : @"ic_playertime_outlined_20"},
+			    @{@"identifier" : @"DYYYProgressLabelColor",
+			      @"title" : @"进度标签颜色",
+			      @"detail" : @"十六进制",
+			      @"cellType" : @26,
+			      @"imageName" : @"ic_playertime_outlined_20"},
+			    @{@"identifier" : @"DYYYTimelineVerticalPosition",
+			      @"title" : @"进度纵轴位置",
+			      @"detail" : @"-12.5",
+			      @"cellType" : @26,
+			      @"imageName" : @"ic_playertime_outlined_20"},
+			    @{@"identifier" : @"DYYYHideVideoProgress",
+			      @"title" : @"隐藏视频进度",
+			      @"detail" : @"",
+			      @"cellType" : @6,
+			      @"imageName" : @"ic_playertime_outlined_20"},
+			    @{@"identifier" : @"DYYYEnableAutoPlay",
+			      @"title" : @"启用自动播放",
+                  @"subTitle" : @"暂时仅支持首页.搜索和个人主页的连播",
+			      @"detail" : @"",
+			      @"cellType" : @37,
+			      @"imageName" : @"ic_play_outlined_12"},
+			    @{@"identifier" : @"DYYYDefaultSpeed",
+			      @"title" : @"设置默认倍速",
+			      @"detail" : @"",
+			      @"cellType" : @26,
+			      @"imageName" : @"ic_speed_outlined_20"},
+	            @{@"identifier" : @"DYYYLongPressSpeed",
+		          @"title" : @"设置长按倍速",
+		          @"detail" : @"",
+		          @"cellType" : @26,
+		          @"imageName" : @"ic_speed_outlined_20"},
+			    @{@"identifier" : @"DYYYEnableArea",
+			      @"title" : @"属地时间显示",
+			      @"detail" : @"",
+			      @"cellType" : @6,
+			      @"imageName" : @"ic_location_outlined_20"},
+			    @{@"identifier" : @"DYYYGeonamesUsername",
+		          @"title" : @"属地国外解析",
+			      @"subTitle" : @"使用 Geonames.org 账号解析国外 IP 属地",
+		          @"detail" : @"此处填写网站的用户名,不填默认",
+		          @"cellType" : @20,
+		          @"imageName" : @"ic_location_outlined_20"},
+		        @{@"identifier" : @"DYYYLabelColor",
+		          @"title" : @"属地时间颜色",
+		          @"subTitle" : @"填入 rainbow 使用渐变颜色",
+		          @"detail" : @"16进制,只填后6位即可,不填默认",
+		          @"cellType" : @20,
+		          @"imageName" : @"ic_location_outlined_20"},
+			    @{@"identifier" : @"DYYYEnableRandomGradient",
+			      @"title" : @"属地颜色随机",
+                  @"subTitle" : @"启用后会覆盖时间颜色",
+			      @"detail" : @"",
+			      @"cellType" : @37,
+			      @"imageName" : @"ic_location_outlined_20"}
+	  ];
 
       for (NSDictionary *dict in videoSettings) {
           AWESettingItemModel *item = [DYYYSettingsHelper createSettingItem:dict cellTapHandlers:cellTapHandlers];
@@ -338,6 +331,7 @@ extern "C"
               item.cellTappedBlock = ^{
                 NSArray *styleOptions = @[ @"进度条两侧上下", @"进度条左侧剩余", @"进度条左侧完整", @"进度条右侧剩余", @"进度条右侧完整" ];
 
+
                 [DYYYOptionsSelectionView showWithPreferenceKey:@"DYYYScheduleStyle"
                                                    optionsArray:styleOptions
                                                      headerText:@"选择进度时长样式"
@@ -360,7 +354,7 @@ extern "C"
             @"cellType" : @26,
             @"imageName" : @"ic_video_outlined_20"},
           @{@"identifier" : @"DYYYEnableVideoHighestQuality",
-            @"title" : @"提高视频画质",
+            @"title" : @"默认最高画质",
             @"detail" : @"",
             @"cellType" : @6,
             @"imageName" : @"ic_squaretriangletwo_outlined_20"},
@@ -423,7 +417,7 @@ extern "C"
             @"cellType" : @26,
             @"imageName" : @"ic_thumbsdown_outlined_20"},
           @{@"identifier" : @"DYYYFilterUsers",
-            @"title" : @"推荐过滤用户",
+            @"title" : @"推荐过滤作者",
             @"detail" : @"",
             @"cellType" : @26,
             @"imageName" : @"ic_userban_outlined_20"},
@@ -474,7 +468,7 @@ extern "C"
       for (NSDictionary *dict in filterSettings) {
           AWESettingItemModel *item = [DYYYSettingsHelper createSettingItem:dict cellTapHandlers:cellTapHandlers];
 
-          if ([item.identifier isEqualToString:@"DYYYFilterLowLikes"]) {
+              if ([item.identifier isEqualToString:@"DYYYFilterLowLikes"]) {
               NSString *savedValue = [[NSUserDefaults standardUserDefaults] objectForKey:@"DYYYFilterLowLikes"];
               item.detail = savedValue ?: @"0";
               item.cellTappedBlock = ^{
@@ -501,14 +495,14 @@ extern "C"
                                              }
                                               onCancel:nil];
               };
-          } else if ([item.identifier isEqualToString:@"DYYYFilterUsers"]) {
+    } else if ([item.identifier isEqualToString:@"DYYYFilterUsers"]) {
               NSString *savedValue = [[NSUserDefaults standardUserDefaults] objectForKey:@"DYYYFilterUsers"];
               item.detail = savedValue ?: @"";
               item.cellTappedBlock = ^{
                 // 将保存的逗号分隔字符串转换为数组
                 NSString *savedKeywords = [[NSUserDefaults standardUserDefaults] objectForKey:@"DYYYFilterUsers"] ?: @"";
                 NSArray *keywordArray = [savedKeywords length] > 0 ? [savedKeywords componentsSeparatedByString:@","] : @[];
-                DYYYKeywordListView *keywordListView = [[DYYYKeywordListView alloc] initWithTitle:@"过滤用户列表" keywords:keywordArray];
+                DYYYKeywordListView *keywordListView = [[DYYYKeywordListView alloc] initWithTitle:@"已过滤的视频作者" keywords:keywordArray];
                 keywordListView.onConfirm = ^(NSArray *keywords) {
                   NSString *keywordString = [keywords componentsJoinedByString:@","];
                   [DYYYSettingsHelper setUserDefaults:keywordString forKey:@"DYYYFilterUsers"];
@@ -518,23 +512,24 @@ extern "C"
 
                 [keywordListView show];
               };
-          } else if ([item.identifier isEqualToString:@"DYYYFilterKeywords"]) {
+         } else if ([item.identifier isEqualToString:@"DYYYFilterKeywords"]) {
               NSString *savedValue = [[NSUserDefaults standardUserDefaults] objectForKey:@"DYYYFilterKeywords"];
+
               item.detail = savedValue ?: @"";
               item.cellTappedBlock = ^{
-                NSString *savedKeywords = [[NSUserDefaults standardUserDefaults] objectForKey:@"DYYYFilterKeywords"] ?: @"";
+                   NSString *savedKeywords = [[NSUserDefaults standardUserDefaults] objectForKey:@"DYYYFilterKeywords"] ?: @"";
                 NSArray *keywordArray = [savedKeywords length] > 0 ? [savedKeywords componentsSeparatedByString:@","] : @[];
-                DYYYKeywordListView *keywordListView = [[DYYYKeywordListView alloc] initWithTitle:@"设置过滤关键词" keywords:keywordArray];
+                DYYYKeywordListView *keywordListView = [[DYYYKeywordListView alloc] initWithTitle:@"已过滤的视频文案" keywords:keywordArray];
                 keywordListView.onConfirm = ^(NSArray *keywords) {
                   NSString *keywordString = [keywords componentsJoinedByString:@","];
 
-                  [DYYYSettingsHelper setUserDefaults:keywordString forKey:@"DYYYFilterKeywords"];
+                    [DYYYSettingsHelper setUserDefaults:keywordString forKey:@"DYYYFilterKeywords"];
                   item.detail = keywordString;
                   [item refreshCell];
                 };
                 [keywordListView show];
               };
-          } else if ([item.identifier isEqualToString:@"DYYYFilterTimeLimit"]) {
+    } else if ([item.identifier isEqualToString:@"DYYYFilterTimeLimit"]) {
               NSString *savedValue = [[NSUserDefaults standardUserDefaults] objectForKey:@"DYYYFilterTimeLimit"];
               item.detail = savedValue ?: @"";
               item.cellTappedBlock = ^{
@@ -559,7 +554,7 @@ extern "C"
                 keywordListView.onConfirm = ^(NSArray *keywords) {
                   NSString *keywordString = [keywords componentsJoinedByString:@","];
 
-                  [DYYYSettingsHelper setUserDefaults:keywordString forKey:@"DYYYFilterProp"];
+                 [DYYYSettingsHelper setUserDefaults:keywordString forKey:@"DYYYFilterProp"];
                   item.detail = keywordString;
                   [item refreshCell];
                 };
@@ -706,7 +701,7 @@ extern "C"
       NSArray *titleSettings = @[
           @{@"identifier" : @"DYYYModifyTopTabText",
             @"title" : @"设置顶栏标题",
-            @"detail" : @"标题=修改#标题=修改",
+            @"detail" : @"标题=修改 例如：推荐=DYYY",
             @"cellType" : @26,
             @"imageName" : @"ic_tag_outlined_20"},
           @{@"identifier" : @"DYYYIndexTitle",
@@ -742,7 +737,7 @@ extern "C"
                 DYYYKeywordListView *keywordListView = [[DYYYKeywordListView alloc] initWithTitle:@"设置顶栏标题" keywords:pairArray];
                 keywordListView.addItemTitle = @"添加标题修改";
                 keywordListView.editItemTitle = @"编辑标题修改";
-                keywordListView.inputPlaceholder = @"原标题=新标题";
+                keywordListView.inputPlaceholder = @"标题=修改 例如：推荐=DYYY";
                 keywordListView.onConfirm = ^(NSArray *keywords) {
                   NSString *keywordString = [keywords componentsJoinedByString:@"#"];
                   [DYYYSettingsHelper setUserDefaults:keywordString forKey:@"DYYYModifyTopTabText"];
@@ -754,6 +749,58 @@ extern "C"
           }
           [titleItems addObject:item];
       }
+
+      // 【个人自定义】分类
+	  NSMutableArray<AWESettingItemModel *> *Masturbation = [NSMutableArray array];
+	  NSArray *MasturbationSettings = @[
+     		    @{@"identifier" : @"DYYYEnableSocialStatsCustom",
+			      @"title" : @"启用数量伪造",
+                              @"subTitle" : @"此功能是全局修改，非必要请谨慎开启！",
+			      @"detail" : @"",
+			      @"cellType" : @37,
+			      @"imageName" : @"ic_personcircleclean_outlined_20"},
+			    @{@"identifier" : @"DYYYCustomLikes",
+			      @"title" : @"获赞数量伪造",
+			      @"detail" : @"",
+			      @"cellType" : @26,
+			      @"imageName" : @"ic_heart_outlined_20"},
+			    @{@"identifier" : @"DYYYCustomMutual",
+			      @"title" : @"互关数量伪造",
+			      @"detail" : @"",
+			      @"cellType" : @26,
+			      @"imageName" : @"ic_usertwo_outlined_20"},
+			    @{@"identifier" : @"DYYYCustomFollowing",
+			      @"title" : @"关注数量伪造",
+			      @"detail" : @"",
+			      @"cellType" : @26,
+			      @"imageName" : @"ic_usertwo_outlined_20"},
+			    @{@"identifier" : @"DYYYCustomFollowers",
+			      @"title" : @"粉丝数量伪造",
+			      @"detail" : @"",
+			      @"cellType" : @26,
+			      @"imageName" : @"ic_usertwo_outlined_20"},
+	            @{@"identifier" : @"DYYYEnableDisguise",
+			      @"title" : @"启用账号伪造",
+			      @"detail" : @"",
+			      @"cellType" : @6,
+			      @"imageName" : @"ic_user_outlined_20"},
+			    @{@"identifier" : @"DYYYDisguiseid",
+			      @"title" : @"抖音号码伪造",
+			      @"detail" : @"请输入1-7位数字或字母",
+			      @"cellType" : @26,
+			      @"imageName" : @"ic_user_outlined_20"},
+	            @{@"identifier" : @"DYYYDisguisenc",
+			      @"title" : @"账号昵称伪造",
+			      @"detail" : @"不填默认",
+			      @"cellType" : @26,
+			      @"imageName" : @"ic_user_outlined_20"}
+
+	  ];
+
+	  for (NSDictionary *dict in MasturbationSettings) {
+		  AWESettingItemModel *item = [DYYYSettingsHelper createSettingItem:dict cellTapHandlers:cellTapHandlers];
+		  [Masturbation addObject:item];
+	  }
 
       // 【图标自定义】分类
       NSMutableArray<AWESettingItemModel *> *iconItems = [NSMutableArray array];
@@ -770,6 +817,7 @@ extern "C"
       [sections addObject:[DYYYSettingsHelper createSectionWithTitle:@"透明度设置" items:transparencyItems]];
       [sections addObject:[DYYYSettingsHelper createSectionWithTitle:@"缩放与大小" items:scaleItems]];
       [sections addObject:[DYYYSettingsHelper createSectionWithTitle:@"标题自定义" items:titleItems]];
+	  [sections addObject:[DYYYSettingsHelper createSectionWithTitle:@"个人自定义" items:Masturbation]];
       [sections addObject:[DYYYSettingsHelper createSectionWithTitle:@"图标自定义" items:iconItems]];
       // 创建并组织所有section
       // 创建并推入二级设置页面
@@ -1040,20 +1088,12 @@ extern "C"
       // 【提示与位置信息】分类
       NSMutableArray<AWESettingItemModel *> *infoItems = [NSMutableArray array];
       NSArray *infoSettings = @[
-          @{@"identifier" : @"DYYYHideLiveView",
+         @{@"identifier" : @"DYYYHideLiveView",
             @"title" : @"隐藏关注顶端",
             @"subTitle" : @"隐藏关注页顶端的直播列表",
             @"detail" : @"",
             @"cellType" : @37,
             @"imageName" : @"ic_eyeslash_outlined_16"},
-          @{
-              @"identifier" : @"DYYYHideConcernCapsuleView",
-              @"title" : @"隐藏关注直播",
-              @"subTitle" : @"隐藏关注页顶端的 N 个直播",
-              @"detail" : @"",
-              @"cellType" : @37,
-              @"imageName" : @"ic_eyeslash_outlined_16"
-          },
           @{
               @"identifier" : @"DYYYHideMenuView",
               @"title" : @"隐藏同城顶端",
@@ -1161,8 +1201,7 @@ extern "C"
               @"subTitle" : @"包括拍摄同款、抖音精选、游戏、轻颜等供稿链接",
               @"detail" : @"",
               @"cellType" : @37,
-              @"imageName" : @"ic_eyeslash_outlined_16"
-          },
+              @"imageName" : @"ic_eyeslash_outlined_16"},
           @{@"identifier" : @"DYYYHideChallengeStickers",
             @"title" : @"隐藏挑战贴纸",
             @"detail" : @"",
@@ -1183,6 +1222,12 @@ extern "C"
             @"title" : @"隐藏作者店铺",
             @"detail" : @"",
             @"cellType" : @6,
+            @"imageName" : @"ic_eyeslash_outlined_16"},
+          @{@"identifier" : @"DYYYHideConcernCapsuleView",
+            @"title" : @"隐藏关注直播",
+            @"subTitle" : @"隐藏关注页顶端的 N 个直播",
+            @"detail" : @"",
+            @"cellType" : @37,
             @"imageName" : @"ic_eyeslash_outlined_16"},
           @{@"identifier" : @"DYYYHideTopBarLine",
             @"title" : @"隐藏顶栏横线",
@@ -1247,14 +1292,12 @@ extern "C"
             @"detail" : @"",
             @"cellType" : @6,
             @"imageName" : @"ic_eyeslash_outlined_16"},
-          @{
-              @"identifier" : @"DYYYHideChapterProgress",
-              @"title" : @"隐藏章节进度",
-              @"subTitle" : @"隐藏可能出现在视频上方或者下方的章节进度条",
-              @"detail" : @"",
-              @"cellType" : @37,
-              @"imageName" : @"ic_eyeslash_outlined_16"
-          },
+          @{@"identifier" : @"DYYYHideChapterProgress",
+            @"title" : @"隐藏章节进度",
+            @"subTitle" : @"隐藏可能出现在视频上方或者下方的章节进度条",
+            @"detail" : @"",
+            @"cellType" : @ 37,
+            @"imageName" : @"ic_eyeslash_outlined_16"},
           @{@"identifier" : @"DYYYHidePopover",
             @"title" : @"隐藏上次看到",
             @"detail" : @"",
@@ -1516,11 +1559,12 @@ extern "C"
             @"detail" : @"",
             @"cellType" : @6,
             @"imageName" : @"ic_eyeslash_outlined_16"},
-          @{@"identifier" : @"DYYYHidePanelBiserial",
-            @"title" : @"隐藏双列快捷入口",
-            @"detail" : @"",
-            @"cellType" : @6,
-            @"imageName" : @"ic_eyeslash_outlined_16"}
+	  @{@"identifier" : @"DYYYHidePanelBiserial",
+	    @"title" : @"隐藏双列快捷入口",
+            @"subTitle" : @"首页双指缩放不会展示双列视图",
+	    @"detail" : @"",
+	    @"cellType" : @37,
+	    @"imageName" : @"ic_eyeslash_outlined_16"}
       ];
 
       for (NSDictionary *dict in modernpanelSettings) {
@@ -1676,7 +1720,7 @@ extern "C"
             @"cellType" : @6,
             @"imageName" : @"ic_xmark_outlined_20"},
           @{@"identifier" : @"DYYYHideOtherChannel",
-            @"title" : @"移除顶栏其他",
+            @"title" : @"移除其它",
             @"detail" : @"",
             @"cellType" : @26,
             @"imageName" : @"ic_xmark_outlined_20"}
@@ -1802,7 +1846,7 @@ extern "C"
             @"cellType" : @6,
             @"imageName" : @"ic_cloudarrowdown_outlined_20"},
           @{@"identifier" : @"DYYYLongPressFilterUser",
-            @"title" : @"长按面板过滤用户",
+            @"title" : @"长按面板过滤作者",
             @"detail" : @"",
             @"cellType" : @6,
             @"imageName" : @"ic_userban_outlined_20"},
@@ -1874,11 +1918,18 @@ extern "C"
             @"detail" : @"",
             @"cellType" : @6,
             @"imageName" : @"ic_emoji_outlined"},
+          @{@"identifier" : @"DYYYAllowConcurrentPlay",
+	    @"title" : @"启用应用同时播放",
+            @"subTitle" : @"播放其它音乐时打开抖音，音乐不会停止",
+	    @"detail" : @"",
+	    @"cellType" : @37,
+	    @"imageName" : @"ic_vertrianglesquareonsquare_outlined_20"},
           @{@"identifier" : @"DYYYHapticFeedbackEnabled",
-            @"title" : @"下载完成震动反馈",
-            @"detail" : @"",
-            @"cellType" : @6,
-            @"imageName" : @"ic_gearsimplify_outlined_20"}
+	    @"title" : @"启用保存媒体反馈",
+            @"subTitle" : @"需先在手机设置中开启系统触感反馈",
+	    @"detail" : @"",
+	    @"cellType" : @37,
+	    @"imageName" : @"ic_gearsimplify_outlined_20"}
       ];
 
       for (NSDictionary *dict in downloadSettings) {
@@ -2484,14 +2535,17 @@ extern "C"
               @"cellType" : @37,
               @"imageName" : @"ic_circlearrowin_outlined_20"
           },
-          @{
-              @"identifier" : @"DYYYVideoGesture",
-              @"title" : @"横屏视频交互增强",
-              @"subTitle" : @"启用横屏视频的手势功能",
-              @"detail" : @"",
-              @"cellType" : @37,
-              @"imageName" : @"ic_phonearrowdown_outlined_20"
-          },
+           @{@"identifier" : @"DYYYtacitanswer",
+	     @"title" : @"启用突破默契回答",
+	     @"detail" : @"",
+	     @"cellType" : @6,
+	     @"imageName" : @"ic_eye_outlined_20"},
+	  @{@"identifier" : @"DYYYVideoGesture",
+	    @"title" : @"启用横屏交互增强",
+            @"subTitle" : @"横屏播放时，左右边缘上下滑动调节音量和亮度",
+	    @"detail" : @"",
+	    @"cellType" : @37,
+	    @"imageName" : @"ic_phonearrowdown_outlined_20"},
           @{
               @"identifier" : @"DYYYDisableAutoEnterLive",
               @"title" : @"禁用自动进入直播",
@@ -2570,14 +2624,12 @@ extern "C"
             @"detail" : @"",
             @"cellType" : @6,
             @"imageName" : @"ic_arrowcircle_outlined_20"},
-          @{
-              @"identifier" : @"DYYYDisableDoubleTapLike",
-              @"title" : @"禁用双击视频点赞",
-              @"subTitle" : @"同时会禁用官方纯净模式的双击点赞",
-              @"detail" : @"",
-              @"cellType" : @37,
-              @"imageName" : @"ic_thumbsup_outlined_20"
-          },
+          @{@"identifier" : @"DYYYDisableDoubleTapLike",
+            @"title" : @"禁用双击视频点赞",
+            @"subTitle" : @"同时会禁用官方纯净模式的双击点赞",
+            @"detail" : @"",
+            @"cellType" : @37,
+            @"imageName" : @"ic_thumbsup_outlined_20"},
           @{
               @"identifier" : @"DYYYEnableDoubleOpenComment",
               @"title" : @"启用双击打开评论",
@@ -2638,7 +2690,7 @@ extern "C"
                       @"cellType" : @6,
                       @"imageName" : @"ic_cloudarrowdown_outlined_20"},
                     @{@"identifier" : @"DYYYDoubleCreateVideo",
-                      @"title" : @"制作视频",
+                      @"title" : @"合成视频",
                       @"detail" : @"",
                       @"cellType" : @6,
                       @"imageName" : @"ic_videosearch_outlined_20"},
@@ -2680,7 +2732,7 @@ extern "C"
               };
           }
 
-          if ([item.identifier isEqualToString:@"DYYYLongPressPanelDark"]) {
+         if ([item.identifier isEqualToString:@"DYYYLongPressPanelDark"]) {
               BOOL isDarkPanelEnabled = [DYYYSettingsHelper getUserDefaults:item.identifier];
               item.svgIconImageName = isDarkPanelEnabled ? @"ic_moon_outlined" : @"ic_sun_outlined";
 
@@ -2858,7 +2910,7 @@ extern "C"
       AWESettingItemModel *enableClearButton = [DYYYSettingsHelper
           createSettingItem:
               @{@"identifier" : @"DYYYEnableFloatClearButton",
-                @"title" : @"一键清屏按钮",
+                @"title" : @"启用一键清屏按钮",
                 @"detail" : @"",
                 @"cellType" : @6,
                 @"imageName" : @"ic_eyeslash_outlined_16"}];
@@ -2908,7 +2960,7 @@ extern "C"
       AWESettingItemModel *hideDanmakuButton = [DYYYSettingsHelper
           createSettingItem:
               @{@"identifier" : @"DYYYHideDanmaku",
-                @"title" : @"清屏隐藏弹幕",
+                @"title" : @"清屏隐藏所有弹幕",
                 @"detail" : @"",
                 @"cellType" : @6,
                 @"imageName" : @"ic_eyeslash_outlined_16"}];
@@ -2916,7 +2968,7 @@ extern "C"
 
       AWESettingItemModel *enableqingButton = [DYYYSettingsHelper createSettingItem:@{
           @"identifier" : @"DYYYRemoveTimeProgress",
-          @"title" : @"清屏移除进度",
+          @"title" : @"清屏移除时间进度",
           @"subTitle" : @"清屏状态下完全移除时间进度条",
           @"detail" : @"",
           @"cellType" : @37,
@@ -2926,7 +2978,7 @@ extern "C"
       // 清屏隐藏时间进度
       AWESettingItemModel *enableqingButton1 = [DYYYSettingsHelper createSettingItem:@{
           @"identifier" : @"DYYYHideTimeProgress",
-          @"title" : @"清屏隐藏进度",
+          @"title" : @"清屏隐藏时间进度",
           @"subTitle" : @"原始位置可拖动时间进度条",
           @"detail" : @"",
           @"cellType" : @37,
@@ -2935,7 +2987,7 @@ extern "C"
       [clearButtonItems addObject:enableqingButton1];
       AWESettingItemModel *hideSliderButton = [DYYYSettingsHelper createSettingItem:@{
           @"identifier" : @"DYYYHideSlider",
-          @"title" : @"清屏隐藏滑条",
+          @"title" : @"清屏隐藏底部滑条",
           @"subTitle" : @"清屏状态下隐藏多图片下方的滑条",
           @"detail" : @"",
           @"cellType" : @37,
@@ -2944,7 +2996,7 @@ extern "C"
       [clearButtonItems addObject:hideSliderButton];
       AWESettingItemModel *hideChapterButton = [DYYYSettingsHelper createSettingItem:@{
           @"identifier" : @"DYYYHideChapter",
-          @"title" : @"清屏隐藏章节",
+          @"title" : @"清屏隐藏章节目录",
           @"subTitle" : @"清屏状态下隐藏部分视频出现的章节进度显示",
           @"detail" : @"",
           @"cellType" : @37,
@@ -2954,14 +3006,14 @@ extern "C"
       AWESettingItemModel *hideTabButton = [DYYYSettingsHelper
           createSettingItem:
               @{@"identifier" : @"DYYYHideTabBar",
-                @"title" : @"清屏隐藏底栏",
+                @"title" : @"清屏隐藏首页底栏",
                 @"detail" : @"",
                 @"cellType" : @6,
                 @"imageName" : @"ic_eyeslash_outlined_16"}];
       [clearButtonItems addObject:hideTabButton];
       AWESettingItemModel *hideSpeedButton = [DYYYSettingsHelper createSettingItem:@{
           @"identifier" : @"DYYYHideSpeed",
-          @"title" : @"清屏隐藏倍速",
+          @"title" : @"清屏隐藏倍速按钮",
           @"subTitle" : @"清屏状态下隐藏DYYY的倍速按钮",
           @"detail" : @"",
           @"cellType" : @37,
