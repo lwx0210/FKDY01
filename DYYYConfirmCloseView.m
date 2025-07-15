@@ -67,7 +67,7 @@
         self.countdownLabel.textAlignment = NSTextAlignmentCenter;
         self.countdownLabel.textColor = [UIColor colorWithRed:11 / 255.0 green:223 / 255.0 blue:154 / 255.0 alpha:1.0];  // #0BDF9A
         self.countdownLabel.font = [UIFont boldSystemFontOfSize:16];
-        self.countdown = 5;
+        self.countdown = 7;
         self.countdownLabel.text = [NSString stringWithFormat:@"%ld 秒后自动关闭", (long)self.countdown];
         [self.contentView addSubview:self.countdownLabel];
 
@@ -102,7 +102,7 @@
         self.confirmButton = [UIButton buttonWithType:UIButtonTypeSystem];
         self.confirmButton.frame = CGRectMake(contentWidth / 2, 0, contentWidth / 2, 55.5);
         self.confirmButton.backgroundColor = [UIColor clearColor];
-        [self.confirmButton setTitle:@"关闭抖音" forState:UIControlStateNormal];
+        [self.confirmButton setTitle:@"立即关闭" forState:UIControlStateNormal];
         [self.confirmButton
             setTitleColor:isDarkMode ? [UIColor colorWithRed:230 / 255.0 green:230 / 255.0 blue:235 / 255.0 alpha:1.0] : [UIColor colorWithRed:45 / 255.0 green:47 / 255.0 blue:56 / 255.0 alpha:1.0]
                  forState:UIControlStateNormal];
