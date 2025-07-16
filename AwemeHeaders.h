@@ -1301,6 +1301,14 @@ static CGFloat gStartVal = 0.0;
 @property(copy, nonatomic) NSString *levelName;
 @end
 
+@interface AWEAwemePlayVideoViewController (SpeedControl)
+- (void)adjustPlaybackSpeed:(float)speed;
+@end
+
+@interface AWEDPlayerFeedPlayerViewController (SpeedControl)
+- (void)adjustPlaybackSpeed:(float)speed;
+@end
+
 //修改id附加起始位 
 @interface AWEUserHomeAccessibilityViewV2 : UIView
 - (void)findAndModifyDouyinLabelInView:(UIView *)view;
