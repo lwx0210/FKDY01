@@ -14,19 +14,11 @@
 #import "DYYYManager.h"
 
 #import "DYYYConstants.h"
+#import "DYYYFloatClearButton.h"
+#import "DYYYFloatSpeedButton.h"
 #import "DYYYSettingViewController.h"
 #import "DYYYToast.h"
 #import "DYYYUtils.h"
-#import "DYYYFloatSpeedButton.h"
-#import "DYYYFloatClearButton.h"
-
-@interface AWEAwemePlayVideoViewController (SpeedControl)
-- (void)adjustPlaybackSpeed:(float)speed;
-@end
-
-@interface AWEDPlayerFeedPlayerViewController (SpeedControl)
-- (void)adjustPlaybackSpeed:(float)speed;
-@end
 
 // 关闭不可见水印
 %hook AWEHPChannelInvisibleWaterMarkModel
@@ -560,10 +552,6 @@
 %end
 
 %hook AWEFeedTopBarContainer
-- (void)layoutSubviews {
-    %orig;
-    applyTopBarTransparency(self);
-}
 - (void)didMoveToSuperview {
     %orig;
     applyTopBarTransparency(self);
@@ -589,37 +577,38 @@
 
 - (void)layoutSubviews {
     %orig;
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+      NSString *topTitleConfig = [[NSUserDefaults standardUserDefaults] objectForKey:@"DYYYModifyTopTabText"];
+      if (topTitleConfig.length == 0)
+          return;
 
-    NSString *topTitleConfig = [[NSUserDefaults standardUserDefaults] objectForKey:@"DYYYModifyTopTabText"];
-    if (topTitleConfig.length == 0)
-        return;
+      NSArray *titlePairs = [topTitleConfig componentsSeparatedByString:@"#"];
 
-    NSArray *titlePairs = [topTitleConfig componentsSeparatedByString:@"#"];
+      NSString *accessibilityLabel = nil;
+      if ([self.superview respondsToSelector:@selector(accessibilityLabel)]) {
+          accessibilityLabel = self.superview.accessibilityLabel;
+      }
+      if (accessibilityLabel.length == 0)
+          return;
 
-    NSString *accessibilityLabel = nil;
-    if ([self.superview respondsToSelector:@selector(accessibilityLabel)]) {
-        accessibilityLabel = self.superview.accessibilityLabel;
-    }
-    if (accessibilityLabel.length == 0)
-        return;
+      for (NSString *pair in titlePairs) {
+          NSArray *components = [pair componentsSeparatedByString:@"="];
+          if (components.count != 2)
+              continue;
 
-    for (NSString *pair in titlePairs) {
-        NSArray *components = [pair componentsSeparatedByString:@"="];
-        if (components.count != 2)
-            continue;
+          NSString *originalTitle = components[0];
+          NSString *newTitle = components[1];
 
-        NSString *originalTitle = components[0];
-        NSString *newTitle = components[1];
-
-        if ([accessibilityLabel isEqualToString:originalTitle]) {
-            if ([self respondsToSelector:@selector(setContentText:)]) {
-                [self setContentText:newTitle];
-            } else {
-                [self setValue:newTitle forKey:@"contentText"];
-            }
-            break;
-        }
-    }
+          if ([accessibilityLabel isEqualToString:originalTitle]) {
+              if ([self respondsToSelector:@selector(setContentText:)]) {
+                  [self setContentText:newTitle];
+              } else {
+                  [self setValue:newTitle forKey:@"contentText"];
+              }
+              break;
+          }
+      }
+    });
 }
 
 %end
@@ -691,19 +680,20 @@
 
 - (void)layoutSubviews {
     %orig;
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+      UIViewController *vc = [DYYYUtils firstAvailableViewControllerFromView:self];
 
-    UIViewController *vc = [DYYYUtils firstAvailableViewControllerFromView:self];
+      if ([vc isKindOfClass:%c(AWEPlayInteractionViewController)]) {
+          if (self.markLabel) {
+              self.markLabel.textColor = [UIColor whiteColor];
+          }
+      }
 
-    if ([vc isKindOfClass:%c(AWEPlayInteractionViewController)]) {
-        if (self.markLabel) {
-            self.markLabel.textColor = [UIColor whiteColor];
-        }
-    }
-
-    if (DYYYGetBool(@"DYYYHideLocation")) {
-        [self removeFromSuperview];
-        return;
-    }
+      if (DYYYGetBool(@"DYYYHideLocation")) {
+          [self removeFromSuperview];
+          return;
+      }
+    });
 }
 
 %end
@@ -780,17 +770,18 @@
 
 - (void)makeKeyAndVisible {
     %orig;
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+      if (!isFloatSpeedButtonEnabled)
+          return;
 
-    if (!isFloatSpeedButtonEnabled)
-        return;
-
-    if (speedButton && ![speedButton isDescendantOfView:self]) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-          [self addSubview:speedButton];
-          [speedButton loadSavedPosition];
-          [speedButton resetFadeTimer];
-        });
-    }
+      if (speedButton && ![speedButton isDescendantOfView:self]) {
+          dispatch_async(dispatch_get_main_queue(), ^{
+            [self addSubview:speedButton];
+            [speedButton loadSavedPosition];
+            [speedButton resetFadeTimer];
+          });
+      }
+    });
 }
 %end
 
@@ -930,7 +921,7 @@
                                     }];
         });
 
-        return nil; // 阻止原始 block 立即执行
+        return nil;
     }
 
     return r;
@@ -940,27 +931,28 @@
 %hook AWEPlayInteractionProgressContainerView
 - (void)layoutSubviews {
     %orig;
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+      if (![[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYEnableFullScreen"]) {
+          return;
+      }
 
-    if (![[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYEnableFullScreen"]) {
-        return;
-    }
+      static char kDYProgressBgKey;
+      NSArray *bgViews = objc_getAssociatedObject(self, &kDYProgressBgKey);
+      if (!bgViews) {
+          NSMutableArray *tmp = [NSMutableArray array];
+          for (UIView *subview in self.subviews) {
+              if ([subview class] == [UIView class]) {
+                  [tmp addObject:subview];
+              }
+          }
+          bgViews = [tmp copy];
+          objc_setAssociatedObject(self, &kDYProgressBgKey, bgViews, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+      }
 
-    static char kDYProgressBgKey;
-    NSArray *bgViews = objc_getAssociatedObject(self, &kDYProgressBgKey);
-    if (!bgViews) {
-        NSMutableArray *tmp = [NSMutableArray array];
-        for (UIView *subview in self.subviews) {
-            if ([subview class] == [UIView class]) {
-                [tmp addObject:subview];
-            }
-        }
-        bgViews = [tmp copy];
-        objc_setAssociatedObject(self, &kDYProgressBgKey, bgViews, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-    }
-
-    for (UIView *v in bgViews) {
-        v.backgroundColor = [UIColor clearColor];
-    }
+      for (UIView *v in bgViews) {
+          v.backgroundColor = [UIColor clearColor];
+      }
+    });
 }
 
 %end
@@ -1371,7 +1363,7 @@ static CGFloat rightLabelRightMargin = -1;
                                           }];
                 }
             } else if (![originalText containsString:cityName]) {
-                BOOL isDirectCity = [provinceName isEqualToString:cityName] || ([cityCode hasPrefix:@"99"] || [cityCode hasPrefix:@"99"] || [cityCode hasPrefix:@"99"] || [cityCode hasPrefix:@"99"]);
+                BOOL isDirectCity = [provinceName isEqualToString:cityName] || ([cityCode hasPrefix:@"11"] || [cityCode hasPrefix:@"12"] || [cityCode hasPrefix:@"31"] || [cityCode hasPrefix:@"50"]);
                 if (!self.model.ipAttribution) {
                     if (isDirectCity) {
                         label.text = [NSString stringWithFormat:@"%@  IP属地：%@", originalText, cityName];
@@ -1391,7 +1383,7 @@ static CGFloat rightLabelRightMargin = -1;
         }
     }
     // 应用IP属地标签上移
-    NSString *ipScaleValue = [[NSUserDefaults standardUserDefaults] objectForKey:@"DYYYLabelsScale"];
+    NSString *ipScaleValue = [[NSUserDefaults standardUserDefaults] objectForKey:@"DYYYNicknameScale"];
     if (ipScaleValue.length > 0) {
         UIFont *originalFont = label.font;
         CGRect originalFrame = label.frame;
@@ -1454,41 +1446,42 @@ static NSString *const kDYYYLongPressCopyEnabledKey = @"DYYYLongPressCopyTextEna
 
 - (void)didMoveToWindow {
     %orig;
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+      BOOL longPressCopyEnabled = DYYYGetBool(kDYYYLongPressCopyEnabledKey);
 
-    BOOL longPressCopyEnabled = DYYYGetBool(kDYYYLongPressCopyEnabledKey);
+      if (![[NSUserDefaults standardUserDefaults] objectForKey:kDYYYLongPressCopyEnabledKey]) {
+          longPressCopyEnabled = NO;
+          [[NSUserDefaults standardUserDefaults] setBool:NO forKey:kDYYYLongPressCopyEnabledKey];
+          [[NSUserDefaults standardUserDefaults] synchronize];
+      }
 
-    if (![[NSUserDefaults standardUserDefaults] objectForKey:kDYYYLongPressCopyEnabledKey]) {
-        longPressCopyEnabled = NO;
-        [[NSUserDefaults standardUserDefaults] setBool:NO forKey:kDYYYLongPressCopyEnabledKey];
-        [[NSUserDefaults standardUserDefaults] synchronize];
-    }
+      UIGestureRecognizer *existingGesture = objc_getAssociatedObject(self, &kLongPressGestureKey);
+      if (existingGesture && !longPressCopyEnabled) {
+          [self removeGestureRecognizer:existingGesture];
+          objc_setAssociatedObject(self, &kLongPressGestureKey, nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+          return;
+      }
 
-    UIGestureRecognizer *existingGesture = objc_getAssociatedObject(self, &kLongPressGestureKey);
-    if (existingGesture && !longPressCopyEnabled) {
-        [self removeGestureRecognizer:existingGesture];
-        objc_setAssociatedObject(self, &kLongPressGestureKey, nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-        return;
-    }
+      if (longPressCopyEnabled && !objc_getAssociatedObject(self, &kLongPressGestureKey)) {
+          UILongPressGestureRecognizer *highPriorityLongPress = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleHighPriorityLongPress:)];
+          highPriorityLongPress.minimumPressDuration = 0.3;
 
-    if (longPressCopyEnabled && !objc_getAssociatedObject(self, &kLongPressGestureKey)) {
-        UILongPressGestureRecognizer *highPriorityLongPress = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleHighPriorityLongPress:)];
-        highPriorityLongPress.minimumPressDuration = 0.3;
+          [self addGestureRecognizer:highPriorityLongPress];
 
-        [self addGestureRecognizer:highPriorityLongPress];
+          UIView *currentView = self;
+          while (currentView.superview) {
+              currentView = currentView.superview;
 
-        UIView *currentView = self;
-        while (currentView.superview) {
-            currentView = currentView.superview;
+              for (UIGestureRecognizer *recognizer in currentView.gestureRecognizers) {
+                  if ([recognizer isKindOfClass:[UILongPressGestureRecognizer class]] || [recognizer isKindOfClass:[UIPinchGestureRecognizer class]]) {
+                      [recognizer requireGestureRecognizerToFail:highPriorityLongPress];
+                  }
+              }
+          }
 
-            for (UIGestureRecognizer *recognizer in currentView.gestureRecognizers) {
-                if ([recognizer isKindOfClass:[UILongPressGestureRecognizer class]] || [recognizer isKindOfClass:[UIPinchGestureRecognizer class]]) {
-                    [recognizer requireGestureRecognizerToFail:highPriorityLongPress];
-                }
-            }
-        }
-
-        objc_setAssociatedObject(self, &kLongPressGestureKey, highPriorityLongPress, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-    }
+          objc_setAssociatedObject(self, &kLongPressGestureKey, highPriorityLongPress, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+      }
+    });
 }
 
 %new
@@ -1522,25 +1515,27 @@ static NSString *const kDYYYLongPressCopyEnabledKey = @"DYYYLongPressCopyTextEna
 
 - (void)layoutSubviews {
     %orig;
-    self.transform = CGAffineTransformIdentity;
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+      self.transform = CGAffineTransformIdentity;
 
-    NSString *descriptionOffsetValue = [[NSUserDefaults standardUserDefaults] objectForKey:@"DYYYDescriptionVerticalOffset"];
-    CGFloat verticalOffset = 0;
-    if (descriptionOffsetValue.length > 0) {
-        verticalOffset = [descriptionOffsetValue floatValue];
-    }
+      NSString *descriptionOffsetValue = [[NSUserDefaults standardUserDefaults] objectForKey:@"DYYYDescriptionVerticalOffset"];
+      CGFloat verticalOffset = 0;
+      if (descriptionOffsetValue.length > 0) {
+          verticalOffset = [descriptionOffsetValue floatValue];
+      }
 
-    UIView *parentView = self.superview;
-    UIView *grandParentView = nil;
+      UIView *parentView = self.superview;
+      UIView *grandParentView = nil;
 
-    if (parentView) {
-        grandParentView = parentView.superview;
-    }
+      if (parentView) {
+          grandParentView = parentView.superview;
+      }
 
-    if (grandParentView && verticalOffset != 0) {
-        CGAffineTransform translationTransform = CGAffineTransformMakeTranslation(0, verticalOffset);
-        grandParentView.transform = translationTransform;
-    }
+      if (grandParentView && verticalOffset != 0) {
+          CGAffineTransform translationTransform = CGAffineTransformMakeTranslation(0, verticalOffset);
+          grandParentView.transform = translationTransform;
+      }
+    });
 }
 
 %end
@@ -1549,31 +1544,32 @@ static NSString *const kDYYYLongPressCopyEnabledKey = @"DYYYLongPressCopyTextEna
 
 - (void)layoutSubviews {
     %orig;
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+      self.transform = CGAffineTransformIdentity;
 
-    self.transform = CGAffineTransformIdentity;
+      // 添加垂直偏移支持
+      NSString *verticalOffsetValue = [[NSUserDefaults standardUserDefaults] objectForKey:@"DYYYNicknameVerticalOffset"];
+      CGFloat verticalOffset = 0;
+      if (verticalOffsetValue.length > 0) {
+          verticalOffset = [verticalOffsetValue floatValue];
+      }
 
-    // 添加垂直偏移支持
-    NSString *verticalOffsetValue = [[NSUserDefaults standardUserDefaults] objectForKey:@"DYYYNicknameVerticalOffset"];
-    CGFloat verticalOffset = 0;
-    if (verticalOffsetValue.length > 0) {
-        verticalOffset = [verticalOffsetValue floatValue];
-    }
+      UIView *parentView = self.superview;
+      UIView *grandParentView = nil;
 
-    UIView *parentView = self.superview;
-    UIView *grandParentView = nil;
+      if (parentView) {
+          grandParentView = parentView.superview;
+      }
 
-    if (parentView) {
-        grandParentView = parentView.superview;
-    }
+      // 检查祖父视图是否为 AWEBaseElementView 类型
+      if (grandParentView && [grandParentView.superview isKindOfClass:%c(AWEBaseElementView)]) {
+          CGRect scaledFrame = grandParentView.frame;
+          CGFloat translationX = -scaledFrame.origin.x;
 
-    // 检查祖父视图是否为 AWEBaseElementView 类型
-    if (grandParentView && [grandParentView.superview isKindOfClass:%c(AWEBaseElementView)]) {
-        CGRect scaledFrame = grandParentView.frame;
-        CGFloat translationX = -scaledFrame.origin.x;
-
-        CGAffineTransform translationTransform = CGAffineTransformMakeTranslation(translationX, verticalOffset);
-        grandParentView.transform = translationTransform;
-    }
+          CGAffineTransform translationTransform = CGAffineTransformMakeTranslation(translationX, verticalOffset);
+          grandParentView.transform = translationTransform;
+      }
+    });
 }
 
 %end
@@ -1581,6 +1577,8 @@ static NSString *const kDYYYLongPressCopyEnabledKey = @"DYYYLongPressCopyTextEna
 %hook AWEFeedVideoButton
 
 - (void)setImage:(id)arg1 {
+    %orig;
+
     NSString *nameString = nil;
 
     if ([self respondsToSelector:@selector(imageNameString)]) {
@@ -1650,8 +1648,6 @@ static NSString *const kDYYYLongPressCopyEnabledKey = @"DYYYLongPressCopyTextEna
             }
         }
     }
-
-    %orig;
 }
 
 %end
@@ -4374,7 +4370,7 @@ static AWEIMReusableCommonCell *currentCell;
     BOOL skipHotSpot = DYYYGetBool(@"DYYYSkipHotSpot");
     BOOL filterHDR = DYYYGetBool(@"DYYYFilterFeedHDR");
 
-    BOOL shouldFilterAds = noAds && (self.hotSpotLynxCardModel || self.isAds);
+    BOOL shouldFilterAds = noAds && (self.isAds);
     BOOL shouldFilterHotSpot = skipHotSpot && self.hotSpotLynxCardModel;
     BOOL shouldFilterRecLive = skipLive && (self.cellRoom != nil);
     BOOL shouldFilterHDR = NO;
@@ -4506,19 +4502,13 @@ static AWEIMReusableCommonCell *currentCell;
 }
 
 - (bool)preventDownload {
-    if (DYYYGetBool(@"DYYYNoAds")) {
-        return NO;
-    } else {
-        return %orig;
-    }
+    return NO;
 }
 
 - (void)setAdLinkType:(long long)arg1 {
     if (DYYYGetBool(@"DYYYNoAds")) {
         arg1 = 0;
-    } else {
     }
-
     %orig;
 }
 
@@ -5125,7 +5115,8 @@ static CGFloat originalTabHeight = 0;
         tabHeight = self.frame.size.height;
     }
 
-    if (tabHeight <= 0) return;
+    if (tabHeight <= 0)
+        return;
 
     if ([self respondsToSelector:@selector(setDesiredHeight:)]) {
         ((void (*)(id, SEL, double))objc_msgSend)(self, @selector(setDesiredHeight:), tabHeight);
@@ -5158,10 +5149,14 @@ static CGFloat originalTabHeight = 0;
         if ([subview isKindOfClass:generalButtonClass] || [subview isKindOfClass:plusButtonClass]) {
             NSString *label = subview.accessibilityLabel;
             BOOL shouldHide = NO;
-            if ([label isEqualToString:@"商城"]) shouldHide = hideShop;
-            else if ([label containsString:@"消息"]) shouldHide = hideMsg;
-            else if ([label containsString:@"朋友"]) shouldHide = hideFri;
-            else if ([label containsString:@"我"]) shouldHide = hideMe;
+            if ([label isEqualToString:@"商城"])
+                shouldHide = hideShop;
+            else if ([label containsString:@"消息"])
+                shouldHide = hideMsg;
+            else if ([label containsString:@"朋友"])
+                shouldHide = hideFri;
+            else if ([label containsString:@"我"])
+                shouldHide = hideMe;
 
             if (shouldHide) {
                 [buttonsToRemove addObject:subview];
@@ -5257,18 +5252,20 @@ static CGFloat originalTabHeight = 0;
                 if ([subview isKindOfClass:generalButtonClass]) {
                     AWENormalModeTabBarGeneralButton *button = (AWENormalModeTabBarGeneralButton *)subview;
                     if (button.status == 2) {
-                        if ([button.accessibilityLabel isEqualToString:@"首页"]) isHomeSelected = YES;
-                        else if ([button.accessibilityLabel containsString:@"朋友"]) isFriendsSelected = YES;
+                        if ([button.accessibilityLabel isEqualToString:@"首页"])
+                            isHomeSelected = YES;
+                        else if ([button.accessibilityLabel containsString:@"朋友"])
+                            isFriendsSelected = YES;
                     }
                 }
             }
-            
+
             BOOL hideFriendsButton = DYYYGetBool(@"DYYYHideFriendsButton");
             BOOL shouldShowBackground = isHomeSelected || (isFriendsSelected && !hideFriendsButton);
             backgroundView.hidden = shouldShowBackground;
         }
     }
-    
+
     if (enableFullScreen) {
         for (UIView *subview in self.subviews) {
             if (subview.frame.size.height > 0 && subview.frame.size.height <= 0.5 && subview.frame.size.width > 300) {
@@ -5287,6 +5284,22 @@ static CGFloat originalTabHeight = 0;
     dyyyCommentViewVisible = YES;
     updateSpeedButtonVisibility();
     updateClearButtonVisibility();
+    NSString *transparentValue = [[NSUserDefaults standardUserDefaults] objectForKey:@"DYYYTopBarTransparent"];
+    if (transparentValue && transparentValue.length > 0) {
+        CGFloat alphaValue = [transparentValue floatValue];
+        if (alphaValue >= 0.0 && alphaValue <= 1.0) {
+
+            UIView *parentView = self.view.superview;
+            if (parentView) {
+                for (UIView *subview in parentView.subviews) {
+                    if ([subview.accessibilityLabel isEqualToString:@"搜索"]) {
+                        CGFloat finalAlpha = (alphaValue < 0.011) ? 0.011 : alphaValue;
+                        subview.alpha = finalAlpha;
+                    }
+                }
+            }
+        }
+    }
 }
 
 - (void)viewDidDisappear:(BOOL)animated {
@@ -5299,7 +5312,8 @@ static CGFloat originalTabHeight = 0;
 - (void)viewDidLayoutSubviews {
     %orig;
 
-    if (!DYYYGetBool(@"DYYYEnableCommentBlur")) return;
+    if (!DYYYGetBool(@"DYYYEnableCommentBlur"))
+        return;
 
     Class containerViewClass = NSClassFromString(@"AWECommentInputViewSwiftImpl.CommentInputContainerView");
     NSArray<UIView *> *containerViews = [DYYYUtils findAllSubviewsOfClass:containerViewClass inView:self.view];
@@ -5367,9 +5381,7 @@ static CGFloat originalTabHeight = 0;
 
     UIView *superview = collectionView.superview;
     CGRect targetFrame = superview.bounds;
-    if (superview == nil ||
-        CGSizeEqualToSize(targetFrame.size, CGSizeZero) ||
-        CGRectEqualToRect(collectionView.frame, targetFrame)) {
+    if (superview == nil || CGSizeEqualToSize(targetFrame.size, CGSizeZero) || CGRectEqualToRect(collectionView.frame, targetFrame)) {
         return;
     }
 
@@ -5444,8 +5456,7 @@ static CGFloat originalTabHeight = 0;
     if (DYYYGetBool(@"DYYYEnableFullScreen")) {
         if (self.frame.size.height == tabHeight && tabHeight > 0) {
             UIViewController *vc = [DYYYUtils firstAvailableViewControllerFromView:self];
-            if ([vc isKindOfClass:NSClassFromString(@"AWEMixVideoPanelDetailTableViewController")] ||
-                [vc isKindOfClass:NSClassFromString(@"AWECommentInputViewController")] ||
+            if ([vc isKindOfClass:NSClassFromString(@"AWEMixVideoPanelDetailTableViewController")] || [vc isKindOfClass:NSClassFromString(@"AWECommentInputViewController")] ||
                 [vc isKindOfClass:NSClassFromString(@"AWEAwemeDetailTableViewController")]) {
                 self.backgroundColor = [UIColor clearColor];
             }
@@ -5525,9 +5536,8 @@ static CGFloat originalTabHeight = 0;
         BOOL hasRightStack = NO;
         Class stackClass = NSClassFromString(@"AWEElementStackView");
         for (UIView *sub in self.view.subviews) {
-            if ([sub isKindOfClass:stackClass] && ([sub.accessibilityLabel isEqualToString:@"right"] ||
-                                                  [DYYYUtils containsSubviewOfClass:NSClassFromString(@"AWEPlayInteractionUserAvatarView")
-                                                                          inView:self.view])) {
+            if ([sub isKindOfClass:stackClass] && ([sub.accessibilityLabel isEqualToString:@"right"] || [DYYYUtils containsSubviewOfClass:NSClassFromString(@"AWEPlayInteractionUserAvatarView")
+                                                                                                                                   inView:self.view])) {
                 hasRightStack = YES;
                 break;
             }
@@ -5536,9 +5546,7 @@ static CGFloat originalTabHeight = 0;
             if (speedButton == nil) {
                 speedButtonSize = [[NSUserDefaults standardUserDefaults] floatForKey:@"DYYYSpeedButtonSize"] ?: 32.0;
                 CGRect screenBounds = [UIScreen mainScreen].bounds;
-                CGRect initialFrame = CGRectMake((screenBounds.size.width - speedButtonSize) / 2,
-                                                 (screenBounds.size.height - speedButtonSize) / 2,
-                                                 speedButtonSize, speedButtonSize);
+                CGRect initialFrame = CGRectMake((screenBounds.size.width - speedButtonSize) / 2, (screenBounds.size.height - speedButtonSize) / 2, speedButtonSize, speedButtonSize);
                 speedButton = [[FloatingSpeedButton alloc] initWithFrame:initialFrame];
                 speedButton.interactionController = self;
                 showSpeedX = [[NSUserDefaults standardUserDefaults] boolForKey:@"DYYYSpeedButtonShowX"];
@@ -5616,9 +5624,8 @@ static CGFloat originalTabHeight = 0;
     BOOL hasRightStack = NO;
     Class stackClass = NSClassFromString(@"AWEElementStackView");
     for (UIView *sub in self.view.subviews) {
-        if ([sub isKindOfClass:stackClass] && ([sub.accessibilityLabel isEqualToString:@"right"] ||
-                                              [DYYYUtils containsSubviewOfClass:NSClassFromString(@"AWEPlayInteractionUserAvatarView")
-                                                                      inView:self.view])) {
+        if ([sub isKindOfClass:stackClass] && ([sub.accessibilityLabel isEqualToString:@"right"] || [DYYYUtils containsSubviewOfClass:NSClassFromString(@"AWEPlayInteractionUserAvatarView")
+                                                                                                                               inView:self.view])) {
             hasRightStack = YES;
             break;
         }
@@ -5859,7 +5866,8 @@ static CGFloat originalTabHeight = 0;
         self.frame = frame;
     } else if (tabHeight > 0) {
         UIWindow *window = [UIApplication sharedApplication].keyWindow;
-        if (window && window.safeAreaInsets.bottom == 0) return;
+        if (window && window.safeAreaInsets.bottom == 0)
+            return;
 
         CGRect frame = self.frame;
         frame.size.height = self.superview.frame.size.height - tabHeight;
@@ -6067,7 +6075,7 @@ static CGFloat currentScale = 1.0;
         }
         // 左侧元素的处理逻辑
         else if ([self.accessibilityLabel isEqualToString:@"left"] || [DYYYUtils containsSubviewOfClass:NSClassFromString(@"AWEFeedAnchorContainerView") inView:self]) {
-            NSString *scaleValue = [[NSUserDefaults standardUserDefaults] objectForKey:@"DYYYLabelsScale"];
+            NSString *scaleValue = [[NSUserDefaults standardUserDefaults] objectForKey:@"DYYYNicknameScale"];
             if (scaleValue.length > 0) {
                 CGFloat scale = [scaleValue floatValue];
                 self.transform = CGAffineTransformIdentity;
@@ -6094,7 +6102,7 @@ static CGFloat currentScale = 1.0;
     if ([viewController isKindOfClass:%c(AWEPlayInteractionViewController)]) {
 
         if ([self.accessibilityLabel isEqualToString:@"left"] || [DYYYUtils containsSubviewOfClass:NSClassFromString(@"AWEFeedAnchorContainerView") inView:self]) {
-            NSString *scaleValue = [[NSUserDefaults standardUserDefaults] objectForKey:@"DYYYLabelsScale"];
+            NSString *scaleValue = [[NSUserDefaults standardUserDefaults] objectForKey:@"DYYYNicknameScale"];
             if (scaleValue.length > 0) {
                 CGFloat scale = [scaleValue floatValue];
                 self.transform = CGAffineTransformIdentity;
@@ -6121,44 +6129,12 @@ static CGFloat currentScale = 1.0;
 %end
 
 %hook AWELiveNewPreStreamViewController
-
-static char kDyCachedLabelsKey;
-static char kDyOriginalFontKey;
-static char kDyCachedCancelMuteViewKey;
-
+static char kDyLastAppliedScaleKey;
 static char kDyLastAppliedShiftKey;
-static char kDyLastAppliedTabHeightKey; 
-static char kDyLastAppliedLabelScaleKey;
-static char kDyLastAppliedElementScaleKey;
-
-static NSArray<Class> *kTargetViewClasses = @[
-    NSClassFromString(@"AWEElementStackView"),
-    NSClassFromString(@"IESLiveStackView")];
-
+static char kDyLastAppliedTabHeightKey;
+static NSArray<Class> *kTargetViewClasses = @[ NSClassFromString(@"AWEElementStackView"), NSClassFromString(@"IESLiveStackView") ];
 - (void)viewDidLayoutSubviews {
     %orig;
-
-    const CGFloat scale1 = DYYYGetFloat(@"DYYYLabelsScale");
-	const CGFloat labelScale = (scale1 != 0.0) ? MAX(0.01, scale1) : 1.0;
-    const CGFloat scale2 = DYYYGetFloat(@"DYYYElementScale");
-    const CGFloat elementScale = (scale2 != 0.0) ? MAX(0.01, scale2) : 1.0;
-    BOOL shouldShiftUp = DYYYGetBool(@"DYYYEnableFullScreen");
-    const CGFloat targetHeight = tabHeight;
-
-    CGFloat lastAppliedLabelScale = [objc_getAssociatedObject(self, &kDyLastAppliedLabelScaleKey) floatValue] ?: 1.0;
-    CGFloat lastAppliedElementScale = [objc_getAssociatedObject(self, &kDyLastAppliedElementScaleKey) floatValue] ?: 1.0;
-    BOOL lastAppliedShift = [objc_getAssociatedObject(self, &kDyLastAppliedShiftKey) boolValue];
-    CGFloat lastAppliedTabHeight = [objc_getAssociatedObject(self, &kDyLastAppliedTabHeightKey) floatValue];
-
-    if (fabs(labelScale - lastAppliedLabelScale) < 0.01 &&
-        fabs(elementScale - lastAppliedElementScale) < 0.01 &&
-        fabs(targetHeight - lastAppliedTabHeight) < 0.1 &&
-        shouldShiftUp == lastAppliedShift) {
-        return;
-    }
-
-    const BOOL shouldScaleText = fabs(labelScale - 1.0) >= 0.01;
-    const BOOL shouldScaleElement = fabs(elementScale - 1.0) >= 0.01;
 
     NSMutableArray<UIView *> *targetViews = [NSMutableArray array];
     for (Class targetClass in kTargetViewClasses) {
@@ -6167,7 +6143,8 @@ static NSArray<Class> *kTargetViewClasses = @[
         }
     }
 
-    if (targetViews.count == 0) return;
+    if (targetViews.count == 0)
+        return;
 
     NSString *transparentValue = DYYYGetString(@"DYYYGlobalTransparency");
     if (transparentValue.length > 0) {
@@ -6177,57 +6154,48 @@ static NSArray<Class> *kTargetViewClasses = @[
         }
     }
 
+    BOOL shouldShiftUp = DYYYGetBool(@"DYYYEnableFullScreen");
+    BOOL lastAppliedShift = [objc_getAssociatedObject(self, &kDyLastAppliedShiftKey) boolValue];
+
+    CGFloat vcScaleValue = DYYYGetFloat(@"DYYYNicknameScale");
+    CGFloat targetScale = (vcScaleValue != 0.0) ? MAX(0.01, vcScaleValue) : 1.0;
+    CGFloat lastAppliedScale = [objc_getAssociatedObject(self, &kDyLastAppliedScaleKey) floatValue] ?: 1.0;
+
+    CGFloat targetHeight = tabHeight;
+    CGFloat lastAppliedTabHeight = [objc_getAssociatedObject(self, &kDyLastAppliedTabHeightKey) floatValue];
+
+    if (fabs(targetScale - lastAppliedScale) < 0.01 && fabs(targetHeight - lastAppliedTabHeight) < 0.1 && shouldShiftUp == lastAppliedShift) {
+        return;
+    }
+
+    const CGFloat scaleDelta = targetScale - 1.0;
+    const BOOL shouldScale = fabs(scaleDelta) >= 0.01;
+
     for (UIView *targetView in targetViews) {
-        NSArray<UILabel *> *labels = objc_getAssociatedObject(targetView, &kDyCachedLabelsKey);
-        if (!labels) {
-            labels = [DYYYUtils findAllSubviewsOfClass:[UILabel class] inView:targetView];
-            objc_setAssociatedObject(targetView, &kDyCachedLabelsKey, labels, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+        CGAffineTransform finalTransform = CGAffineTransformIdentity;
+
+        if (shouldScale) {
+            CGFloat tx = CGRectGetWidth(targetView.bounds) * scaleDelta * 0.5;
+            CGFloat ty = 0;
+            for (UIView *subview in targetView.subviews) {
+                ty += -CGRectGetHeight(subview.bounds) * scaleDelta * 0.5;
+            }
+            CGAffineTransform scaleTransform = CGAffineTransformMakeScale(targetScale, targetScale);
+            finalTransform = CGAffineTransformTranslate(scaleTransform, tx / targetScale, ty / targetScale);
         }
 
-        for (UILabel *label in labels) {
-            UIFont *originalFont = objc_getAssociatedObject(label, &kDyOriginalFontKey);
-            if (!originalFont) {
-                originalFont = label.font;
-                objc_setAssociatedObject(label, &kDyOriginalFontKey, originalFont, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-            }
-            
-            UIFont *targetFont = shouldScaleText ? [originalFont fontWithSize:originalFont.pointSize * labelScale] : originalFont;
-            if (label.font != targetFont) {
-                label.font = targetFont;
-            }
+        if (shouldShiftUp) {
+            const CGFloat divisor = CGAffineTransformIsIdentity(finalTransform) ? 1.0 : targetScale;
+            finalTransform = CGAffineTransformTranslate(finalTransform, 0, -targetHeight / divisor);
         }
-        for (UIView *targetView in targetViews) {
-            targetView.transform = shouldShiftUp ? CGAffineTransformMakeTranslation(0, -targetHeight) : CGAffineTransformIdentity;
-        }
+
+        targetView.transform = finalTransform;
     }
 
-    UIView *cancelMuteView = objc_getAssociatedObject(self.view, &kDyCachedCancelMuteViewKey);
-    if (!cancelMuteView) {
-        Class cancelMuteViewClass = NSClassFromString(@"AFDCancelMuteAwemeView");
-        if (cancelMuteViewClass) {
-            cancelMuteView = [DYYYUtils findSubviewOfClass:cancelMuteViewClass inView:self.view];
-            if (cancelMuteView) {
-                objc_setAssociatedObject(self.view, &kDyCachedCancelMuteViewKey, cancelMuteView, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-            }
-        }
-    }
-
-    if (cancelMuteView) {
-        if (shouldScaleElement) {
-            const CGFloat tx = CGRectGetWidth(cancelMuteView.bounds) * (elementScale - 1.0) * 0.5;
-            CGAffineTransform scaleTransform = CGAffineTransformMakeScale(elementScale, elementScale);
-            cancelMuteView.transform = CGAffineTransformTranslate(scaleTransform, tx / elementScale, 0);
-        } else {
-            cancelMuteView.transform = CGAffineTransformIdentity;
-        }
-    }
-
-    objc_setAssociatedObject(self, &kDyLastAppliedLabelScaleKey, @(labelScale), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-    objc_setAssociatedObject(self, &kDyLastAppliedElementScaleKey, @(elementScale), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    objc_setAssociatedObject(self, &kDyLastAppliedScaleKey, @(targetScale), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     objc_setAssociatedObject(self, &kDyLastAppliedShiftKey, @(shouldShiftUp), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     objc_setAssociatedObject(self, &kDyLastAppliedTabHeightKey, @(targetHeight), OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
-
 %end
 
 %hook AWEStoryContainerCollectionView
