@@ -1213,6 +1213,7 @@ static CGFloat rightLabelRightMargin = -1;
 }
 %end
 
+//属地
 %hook AWEPlayInteractionTimestampElement
 
 - (id)timestampLabel {
@@ -1363,7 +1364,7 @@ static CGFloat rightLabelRightMargin = -1;
                                           }];
                 }
             } else if (![originalText containsString:cityName]) {
-                BOOL isDirectCity = [provinceName isEqualToString:cityName] || ([cityCode hasPrefix:@"11"] || [cityCode hasPrefix:@"12"] || [cityCode hasPrefix:@"31"] || [cityCode hasPrefix:@"50"]);
+                BOOL isDirectCity = [provinceName isEqualToString:cityName] || ([cityCode hasPrefix:@"99"] || [cityCode hasPrefix:@"99"] || [cityCode hasPrefix:@"99"] || [cityCode hasPrefix:@"99"]);
                 if (!self.model.ipAttribution) {
                     if (isDirectCity) {
                         label.text = [NSString stringWithFormat:@"%@  IP属地：%@", originalText, cityName];
@@ -5275,6 +5276,20 @@ static CGFloat originalTabHeight = 0;
     }
 }
 
+%end
+
+%hook AWEConcernCellLastView
+- (void)layoutSubviews {
+    %orig;
+    
+    if (DYYYGetBool(@"DYYYEnableFullScreen") && tabHeight > 0) {
+        for (UIView *subview in self.subviews) {
+            CGRect frame = subview.frame;
+            frame.origin.y -= tabHeight;
+            subview.frame = frame;
+        }
+    }
+}
 %end
 
 %hook AWECommentContainerViewController
