@@ -135,6 +135,51 @@ static bool getUserDefaults(NSString *key) { return [[NSUserDefaults standardUse
 
 %end
 
+//隐藏设置关于
+%hook AWESettingsTableViewController
+- (void)viewDidLoad {
+    %orig;
+
+    if (DYYYGetBool(@"DYYYHideSettingsAbout")) {
+        [self removeAboutSection];
+    }
+}
+
+%new
+- (void)removeAboutSection {
+    // 获取 viewModel 属性
+    id viewModel = [self viewModel];
+    if (!viewModel) {
+        return;
+    }
+
+    NSArray *sectionDataArray = [viewModel valueForKey:@"sectionDataArray"];
+    if (!sectionDataArray || ![sectionDataArray isKindOfClass:[NSArray class]]) {
+        return;
+    }
+
+    NSMutableArray *mutableSections = [sectionDataArray mutableCopy];
+
+    // 遍历查找"关于"部分
+    for (id sectionModel in [sectionDataArray copy]) {
+
+        Class sectionModelClass = NSClassFromString(@"AWESettingSectionModel");
+        if (!sectionModelClass || ![sectionModel isKindOfClass:sectionModelClass]) {
+            continue;
+        }
+
+        // 获取 sectionHeaderTitle
+        NSString *sectionHeaderTitle = [sectionModel valueForKey:@"sectionHeaderTitle"];
+        if ([sectionHeaderTitle isEqualToString:@"关于"]) {
+
+            [mutableSections removeObject:sectionModel];
+            [viewModel setValue:mutableSections forKey:@"sectionDataArray"];
+            break;
+        }
+    }
+}
+%end
+
 //游戏作弊声明
 NSArray<NSString *> *diceImageURLs = @[@"url1", @"url2"];
 NSArray<NSString *> *rpsImageURLs = @[@"url1", @"url2"];
