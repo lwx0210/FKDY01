@@ -1049,7 +1049,7 @@ static CGFloat gStartVal = 0.0;
 @interface HTSLiveDiggView : UIView
 @end
 @interface IESLiveStickerView : UIView
-%end
+@end
 @interface IESLiveGroupLiveComponentView : UIView
 @end
 @interface IESLivePreAnnouncementPanelViewNew : UIView
