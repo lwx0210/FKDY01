@@ -289,33 +289,27 @@ static CGFloat gStartVal = 0.0;
 @interface AWEAwemePlayVideoViewController : UIViewController
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSKeyValueChangeKey, id> *)change context:(void *)context;
 - (void)setVideoControllerPlaybackRate:(double)arg0;
-
 @end
 
 @interface AWECommentMiniEmoticonPanelView : UIView
-
 @end
 
 @interface AWEBaseElementView : UIView
 @end
 
 @interface AWESearchEntranceView : UIView
-
 @end
 
 @interface AWETextViewInternal : UITextView
-
 @end
 
 @interface AWECommentPublishGuidanceView : UIView
-
 @end
 
 @interface AWEPlayInteractionFollowPromptView : UIView
 @end
 
 @interface AWENormalModeTabBarTextView : UIView
-
 @end
 
 @interface AWEFamiliarNavView : UIView
@@ -332,19 +326,20 @@ static CGFloat gStartVal = 0.0;
 @end
 
 @interface AWEAdAvatarView : UIView
+@end
 
+@interface AWETabBarSkinContainerView : UIView
 @end
 
 @interface AWENormalModeTabBar : UIView
+@property(retain, nonatomic) AWETabBarSkinContainerView *skinContainerView;
 @property(nonatomic, assign, readonly) UITabBarController *yy_viewController;
 @end
 
 @interface AWEPlayInteractionListenFeedView : UIView
-
 @end
 
 @interface AWEFeedLiveMarkView : UIView
-
 @end
 
 @interface AWEPlayInteractionTimestampElement : UIView
@@ -1054,12 +1049,16 @@ static CGFloat gStartVal = 0.0;
 @interface HTSLiveDiggView : UIView
 @end
 @interface IESLiveStickerView : UIView
+%end
+@interface IESLiveGroupLiveComponentView : UIView
 @end
 @interface IESLivePreAnnouncementPanelViewNew : UIView
 @end
 @interface IESLiveDynamicUserEnterView : UIView
 @end
 @interface IESLiveDynamicRankListEntranceView : UIView
+@end
+@interface IESLiveDanmakuSupremeView : UIView
 @end
 @interface IESLiveShortTouchActionView : UIView
 @end
